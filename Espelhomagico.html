@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Livro Interativo com Rosto Animado</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #222;
+      color: white;
+      text-align: center;
+    }
+    video, canvas {
+      display: none;
+    }
+    #cenario {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+    }
+    #personagem {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      animation: andar 5s linear infinite;
+    }
+    @keyframes andar {
+      0% { left: 0; }
+      100% { left: 100%; }
+    }
+    #botoes {
+      margin: 20px;
+    }
+    #foto {
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      position: absolute;
+      top: 30px;
+      left: 60px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Livro Interativo com Rosto Animado</h1>
+
+  <div id="botoes">
+    <input type="text" id="nome" placeholder="Digite seu nome" />
+    <button onclick="tirarFoto()">Tirar Foto</button>
+    <button onclick="iniciarHistoria()">Começar História</button>
+  </div>
+
+  <video id="video" autoplay></video>
+  <canvas id="canvas"></canvas>
+
+  <div id="cenario">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Castle_cartoon.svg/1024px-Castle_cartoon.svg.png" width="100%" />
+    <img id="personagem" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Superhero_cartoon.svg/512px-Superhero_cartoon.svg.png" width="150">
+    <img id="foto" src="" />
+  </div>
+
+  <audio id="efeito" src="https://cdn.pixabay.com/audio/2022/03/15/audio_3ce9f76ef3.mp3"></audio>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const foto = document.getElementById('foto');
+    const efeito = document.getElementById('efeito');
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => video.srcObject = stream)
+      .catch(err => alert("Erro ao acessar câmera: " + err));
+
+    function tirarFoto() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const dataURL = canvas.toDataURL('image/png');
+      foto.src = dataURL;
+      foto.style.display = 'block';
+    }
+
+    function iniciarHistoria() {
+      const nome = document.getElementById("nome").value || "Herói";
+      const texto = `Era uma vez, em um reino distante, ${nome} caminhava em direção ao castelo para enfrentar um desafio épico.`;
+
+      const fala = new SpeechSynthesisUtterance(texto);
+      fala.lang = 'pt-BR';
+      speechSynthesis.speak(fala);
+      efeito.play();
+    }
+  </script>
+</body>
+</html>
